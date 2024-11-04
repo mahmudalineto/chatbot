@@ -5,15 +5,16 @@ from openai import OpenAI
 st.title("💬 Ministério de Pequenos Grupos")
 st.write(
     "Querido líder de PG ou GD, você pode perguntar o que quiser a respeito de Grupos neste chat."
-    "Todas as informações foram treinadas com dados públicos"
-    "Que Deus o abençoe :)"
 )
 st.write("")
 st.write(
-    "Querido líder de PG ou GD, você pode perguntar o que quiser a respeito de Grupos neste chat."
     "Todas as informações foram treinadas com dados públicos"
+)
+st.write("")
+st.write(
     "Que Deus o abençoe :)"
 )
+
 
 # Ask user for their OpenAI API key via `st.text_input`.
 # Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
