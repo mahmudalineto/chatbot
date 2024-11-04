@@ -4,7 +4,13 @@ from openai import OpenAI
 # Show title and description.
 st.title("💬 Ministério de Pequenos Grupos")
 st.write(
-    "Querido líder de PG ou GD, você pode perguntar o que quiser a respeito de Grupos neste chat.\n"
+    "Querido líder de PG ou GD, você pode perguntar o que quiser a respeito de Grupos neste chat."
+    "Todas as informações foram treinadas com dados públicos"
+    "Que Deus o abençoe :)"
+)
+st.write("")
+st.write(
+    "Querido líder de PG ou GD, você pode perguntar o que quiser a respeito de Grupos neste chat."
     "Todas as informações foram treinadas com dados públicos"
     "Que Deus o abençoe :)"
 )
