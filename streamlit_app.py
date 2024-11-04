@@ -15,10 +15,15 @@ st.markdown(
 )
 
 # Use the API key from st.secrets
-openai_api_key = st.secrets["openai_api_key"]
-
-# Initialize OpenAI client with the stored API key.
-client = OpenAI(api_key=openai_api_key)
+try:
+    openai_api_key = st.secrets["openai_api_key"]
+    client = OpenAI(api_key=openai_api_key)
+except KeyError:
+    st.error("API key não encontrada em st.secrets. Verifique o arquivo secrets.toml.")
+    st.stop()
+except Exception as e:
+    st.error(f"Erro ao inicializar o cliente OpenAI: {e}")
+    st.stop()
 
 # Initialize session state for storing chat messages.
 if "messages" not in st.session_state:
@@ -38,19 +43,22 @@ if prompt := st.chat_input("Digite sua pergunta aqui..."):
         st.markdown(prompt)
 
     # Generate a response from the OpenAI API.
-    response = ""
-    stream = client.chat_completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": m["role"], "content": m["content"]}
-            for m in st.session_state.messages
-        ],
-        stream=True,
-    )
+    try:
+        stream = client.chat_completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages
+            ],
+            stream=True,
+        )
 
-    # Stream the assistant's response.
-    with st.chat_message("assistant"):
-        response = st.write_stream(stream)
+        response = ""
+        for chunk in stream:
+            response_chunk = chunk.choices[0].delta.get("content", "")
+            response += response_chunk
+            st.markdown(response_chunk)
 
-    # Store assistant's response in session state.
-    st.session_state.messages.append({"role": "assistant", "content": response})
+        st.session_state.messages.append({"role": "assistant", "content": response})
+    except Exception as e:
+        st.error(f"Erro ao gerar resposta: {e}")
