@@ -1,5 +1,7 @@
 import streamlit as st
-from openai import OpenAI
+from langchain.llms import OpenAI
+from langchain.chains import ConversationChain
+from langchain.memory import ConversationBufferMemory
 
 # Show title and description with spacing.
 st.title("💬 Ministério de Pequenos Grupos")
@@ -23,8 +25,12 @@ openai_api_key = st.text_input("OpenAI API Key", type="password")
 if not openai_api_key:
     st.info("Please add your OpenAI API key to continue.", icon="🗝️")
 else:
-    # Initialize OpenAI client with the provided API key.
-    client = OpenAI(api_key=openai_api_key)
+    # Initialize LangChain OpenAI LLM with the provided API key.
+    llm = OpenAI(api_key=openai_api_key, model="gpt-3.5-turbo", streaming=True)
+
+    # Initialize ConversationChain with memory.
+    memory = ConversationBufferMemory()
+    conversation = ConversationChain(llm=llm, memory=memory)
 
     # Initialize session state for storing chat messages.
     if "messages" not in st.session_state:
@@ -43,20 +49,12 @@ else:
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # Generate a response from the OpenAI API.
-        response = ""
-        stream = client.chat_completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
-            stream=True,
-        )
+        # Generate a response from the LangChain ConversationChain.
+        response = conversation.run(prompt)
 
-        # Stream the assistant's response.
+        # Display assistant's response.
         with st.chat_message("assistant"):
-            response = st.write_stream(stream)
+            st.markdown(response)
 
         # Store assistant's response in session state.
         st.session_state.messages.append({"role": "assistant", "content": response})
